@@ -3,9 +3,10 @@
 *&---------------------------------------------------------------------*
 *&
 *&---------------------------------------------------------------------*
+REPORT z_sd_konk_del_zzvorgaenger.
 
-INCLUDE Z_SD_KONK_DEL_ZZVORGAENGER_TOP          .    " Global Data
+INCLUDE z_sd_konk_del_zzvorgaenger_top          .    " Global Data
 
-INCLUDE Z_SD_KONK_DEL_ZZVORGAENGER_CI.
+INCLUDE z_sd_konk_del_zzvorgaenger_cd.
 
-INCLUDE Z_SD_KONK_DEL_ZZVORGAENGER_CD.
+INCLUDE z_sd_konk_del_zzvorgaenger_ci.
