@@ -30,13 +30,22 @@
     </item>
     <item>
      <ID>S</ID>
-     <KEY>P_DAYS</KEY>
+     <KEY>P_DATE</KEY>
+     <ENTRY>Datum</ENTRY>
+     <LENGTH>13</LENGTH>
     </item>
     <item>
      <ID>S</ID>
      <KEY>P_FLAG</KEY>
      <ENTRY>Test durchlauf</ENTRY>
      <LENGTH>22</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>S_ATTYP</KEY>
+     <ENTRY>.</ENTRY>
+     <LENGTH>9</LENGTH>
+     <SPLIT>D</SPLIT>
     </item>
     <item>
      <ID>S</ID>
@@ -47,7 +56,7 @@
     </item>
     <item>
      <ID>S</ID>
-     <KEY>S_MATNR</KEY>
+     <KEY>S_NODE</KEY>
      <ENTRY>.</ENTRY>
      <LENGTH>9</LENGTH>
      <SPLIT>D</SPLIT>
