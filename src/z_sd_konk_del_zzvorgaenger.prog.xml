@@ -23,16 +23,9 @@
     </item>
     <item>
      <ID>S</ID>
-     <KEY>P_ATTYP</KEY>
-     <ENTRY>.</ENTRY>
-     <LENGTH>9</LENGTH>
-     <SPLIT>D</SPLIT>
-    </item>
-    <item>
-     <ID>S</ID>
-     <KEY>P_DATE</KEY>
-     <ENTRY>Datum</ENTRY>
-     <LENGTH>13</LENGTH>
+     <KEY>G_DATE</KEY>
+     <ENTRY>Datum bis</ENTRY>
+     <LENGTH>17</LENGTH>
     </item>
     <item>
      <ID>S</ID>

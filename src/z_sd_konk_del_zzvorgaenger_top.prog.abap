@@ -18,8 +18,8 @@ TYPES: BEGIN OF g_zsd_konk_allg_struct,
          erfdat       TYPE zerfdat,
          matkl        TYPE matkl,
          attyp        TYPE attyp,
-         zlabst_a     TYPE labst,
-         zlabst_b     TYPE labst,
+         zlabst_a     TYPE Z_SD_KONK_LABST_A,
+         zlabst_b     TYPE Z_SD_KONK_LABST_B,
        END OF g_zsd_konk_allg_struct.
 
 TYPES: BEGIN OF g_inventory_struct,
@@ -30,7 +30,7 @@ TYPES: BEGIN OF g_inventory_struct,
 
 TYPES: BEGIN OF g_mat_werks_struct,
          matnr TYPE matnr,
-         werks TYPE werks_d,
+         werks TYPE kunnr,
        END OF g_mat_werks_struct.
 
 TYPES: BEGIN OF g_werks_typ_struct,
@@ -45,11 +45,12 @@ TYPES: BEGIN OF g_marc_matnr_struct,
 
 TYPES: BEGIN OF g_mat_werks_locnr_struct,
          matnr TYPE matnr,
-         locnr TYPE kunnr,
+         werks TYPE kunnr,
        END OF g_mat_werks_locnr_struct.
 
 TYPES: BEGIN OF ty_matnr_werks_a,
-         matnr TYPE matnr18,
+         matnr TYPE matnr,
+         werks TYPE werks_d,
        END OF ty_matnr_werks_a.
 
 DATA: g_node                 TYPE wrf_matgrp_sku-node,
