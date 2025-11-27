@@ -4,7 +4,6 @@
 TABLES: zsd_konk_allg, wrf1, mard, marc.
 
 CLASS lcl_select_material DEFINITION DEFERRED.
-CLASS lcl_compare_material DEFINITION DEFERRED.
 CLASS lcl_display_material DEFINITION DEFERRED.
 
 TYPES: BEGIN OF g_wrf_matgrp_sku_struct,
@@ -18,8 +17,8 @@ TYPES: BEGIN OF g_zsd_konk_allg_struct,
          erfdat       TYPE zerfdat,
          matkl        TYPE matkl,
          attyp        TYPE attyp,
-         zlabst_a     TYPE Z_SD_KONK_LABST_A,
-         zlabst_b     TYPE Z_SD_KONK_LABST_B,
+         zlabst_a     TYPE z_sd_konk_labst_a,
+         zlabst_b     TYPE z_sd_konk_labst_b,
        END OF g_zsd_konk_allg_struct.
 
 TYPES: BEGIN OF g_inventory_struct,
@@ -53,21 +52,31 @@ TYPES: BEGIN OF ty_matnr_werks_a,
          werks TYPE werks_d,
        END OF ty_matnr_werks_a.
 
-DATA: g_node                 TYPE wrf_matgrp_sku-node,
-      g_matkl                TYPE matkl,
-      l_lcl_select_material  TYPE REF TO lcl_select_material,
-      l_lcl_compare_material TYPE REF TO lcl_compare_material,
-      l_lcl_display_material TYPE REF TO lcl_display_material,
-      lt_zsd_konk_allg       TYPE TABLE OF g_zsd_konk_allg_struct,
-      lt_wrf_matgrp_sku      TYPE TABLE OF g_wrf_matgrp_sku_struct,
-      lt_inventory           TYPE TABLE OF g_inventory_struct,
-      ls_inventory           TYPE g_inventory_struct,
-      lt_mat_werks           TYPE TABLE OF g_mat_werks_struct,
-      lt_werks_typ           TYPE TABLE OF g_werks_typ_struct,
-      lt_marc_matnr          TYPE TABLE OF g_marc_matnr_struct,
-      lt_mat_werks_locnr     TYPE TABLE OF g_mat_werks_locnr_struct,
-      lt_matnr_a             TYPE TABLE OF ty_matnr_werks_a,
-      ls_matnr_a             TYPE ty_matnr_werks_a.
+
+TYPES: BEGIN OF ty_matnr_werks_b,
+         matnr TYPE matnr,
+         werks TYPE werks_d,
+       END OF ty_matnr_werks_b.
+
+DATA: g_node  TYPE wrf_matgrp_sku-node,
+      g_matkl TYPE matkl.
+
+DATA: l_lcl_select_material  TYPE REF TO lcl_select_material,
+      l_lcl_display_material TYPE REF TO lcl_display_material.
+
+DATA: l_zsd_konk_allg   TYPE TABLE OF g_zsd_konk_allg_struct,
+      l_wrf_matgrp_sku  TYPE TABLE OF g_wrf_matgrp_sku_struct,
+      l_inventory_table TYPE TABLE OF g_inventory_struct,
+      l_mat_werks       TYPE TABLE OF g_mat_werks_struct,
+      l_werks_typ       TYPE TABLE OF g_werks_typ_struct,
+      l_marc_matnr      TYPE TABLE OF g_marc_matnr_struct,
+      l_mat_werks_locnr TYPE TABLE OF g_mat_werks_locnr_struct,
+      l_matnr_a_table   TYPE TABLE OF ty_matnr_werks_a,
+      l_matnr_b_table   TYPE TABLE OF ty_matnr_werks_b.
+
+DATA: l_inventory TYPE g_inventory_struct,
+      l_matnr_a   TYPE ty_matnr_werks_a,
+      l_matnr_b   TYPE ty_matnr_werks_b.
 
 SELECTION-SCREEN BEGIN OF BLOCK b1 WITH FRAME TITLE TEXT-001.
 

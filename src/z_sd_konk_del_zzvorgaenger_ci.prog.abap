@@ -7,71 +7,77 @@ CLASS lcl_select_material IMPLEMENTATION.
 
     SELECT matnr, node
       FROM wrf_matgrp_sku
-      INTO CORRESPONDING FIELDS OF TABLE @lt_wrf_matgrp_sku
+      INTO CORRESPONDING FIELDS OF TABLE @l_wrf_matgrp_sku
       WHERE node = @s_node-low.
 
-    IF lt_wrf_matgrp_sku IS NOT INITIAL.
+    IF l_wrf_matgrp_sku IS NOT INITIAL.
       SELECT matnr, zzvorgaenger, erfdat, matkl, attyp
           FROM zsd_konk_allg
-          INTO CORRESPONDING FIELDS OF TABLE @lt_zsd_konk_allg
-          FOR ALL ENTRIES IN @lt_wrf_matgrp_sku
-          WHERE matnr = @lt_wrf_matgrp_sku-matnr
+          INTO CORRESPONDING FIELDS OF TABLE @l_zsd_konk_allg
+          FOR ALL ENTRIES IN @l_wrf_matgrp_sku
+          WHERE matnr = @l_wrf_matgrp_sku-matnr
             AND  matkl IN @s_matkl
             AND attyp IN @s_attyp
             AND erfdat <= @g_date.
     ENDIF.
+
+
+    IF l_zsd_konk_allg IS INITIAL.
+      MESSAGE: 'Es wurden keine veralteten Vorgänger gefunden.' TYPE 'E'.
+    ENDIF.
   ENDMETHOD.
 
   METHOD select_inventory.
-    IF lt_wrf_matgrp_sku IS NOT INITIAL.
+    IF l_wrf_matgrp_sku IS NOT INITIAL.
 
-      MOVE-CORRESPONDING lt_wrf_matgrp_sku TO lt_marc_matnr.
+      MOVE-CORRESPONDING l_wrf_matgrp_sku TO l_marc_matnr.
 
       SELECT matnr, werks
         FROM marc
-        INTO CORRESPONDING FIELDS OF TABLE @lt_mat_werks
-        FOR ALL ENTRIES IN @lt_marc_matnr
-        WHERE matnr = @lt_marc_matnr-matnr.
+        INTO CORRESPONDING FIELDS OF TABLE @l_mat_werks
+        FOR ALL ENTRIES IN @l_marc_matnr
+        WHERE matnr = @l_marc_matnr-matnr.
 
-      MOVE-CORRESPONDING lt_mat_werks TO lt_mat_werks_locnr.
+      MOVE-CORRESPONDING l_mat_werks TO l_mat_werks_locnr.
 
       SELECT locnr AS werks,
            vlfkz
         FROM wrf1
-        INTO TABLE @lt_werks_typ
-        FOR ALL ENTRIES IN @lt_mat_werks_locnr
-        WHERE locnr = @lt_mat_werks_locnr-werks AND vlfkz = 'A'.
+        INTO TABLE @l_werks_typ
+        FOR ALL ENTRIES IN @l_mat_werks_locnr
+        WHERE locnr = @l_mat_werks_locnr-werks AND vlfkz = 'A'.
 
       "-----------------------------------------------
 
-      CLEAR lt_matnr_a.
+      CLEAR l_matnr_a.
 
-      IF lt_werks_typ IS NOT INITIAL.
+      IF l_werks_typ IS NOT INITIAL.
         SELECT DISTINCT matnr, werks
           FROM marc
-          INTO CORRESPONDING FIELDS OF TABLE @lt_matnr_a
-          FOR ALL ENTRIES IN @lt_werks_typ
-          WHERE werks = @lt_werks_typ-werks.
+          INTO CORRESPONDING FIELDS OF TABLE @l_matnr_a_table
+          FOR ALL ENTRIES IN @l_werks_typ
+          WHERE werks = @l_werks_typ-werks.
       ENDIF.
 
-      CLEAR lt_inventory.
-      CLEAR ls_inventory.
-      ls_inventory-matnr = ls_matnr_a-matnr.
+      CLEAR l_inventory.
+      CLEAR l_inventory.
+      l_inventory-matnr = l_matnr_a-matnr.
 
-      IF lt_matnr_a IS NOT INITIAL.
+
+      "Typ A Lagerbestand
+      IF l_matnr_a IS NOT INITIAL.
         SELECT labst AS labst_a
-        INTO CORRESPONDING FIELDS OF TABLE @lt_inventory
+        INTO CORRESPONDING FIELDS OF TABLE @l_inventory_table
         FROM mard
-        FOR ALL ENTRIES IN @lt_matnr_a
-        WHERE matnr = @lt_matnr_a-matnr
-          AND werks = @lt_matnr_a-werks.
+        WHERE matnr = @l_matnr_a-matnr
+          AND werks = @l_matnr_a-werks.
 
-        APPEND ls_inventory TO lt_inventory.
+        APPEND l_inventory TO l_inventory_table.
       ENDIF.
 
-      LOOP AT lt_zsd_konk_allg ASSIGNING FIELD-SYMBOL(<fs_allg>).
+      LOOP AT l_zsd_konk_allg ASSIGNING FIELD-SYMBOL(<fs_allg>).
 
-        READ TABLE lt_inventory ASSIGNING FIELD-SYMBOL(<fs_inv>)
+        READ TABLE l_inventory_table ASSIGNING FIELD-SYMBOL(<fs_inv>)
              WITH KEY matnr = <fs_allg>-matnr.
 
         IF sy-subrc = 0.
@@ -80,7 +86,33 @@ CLASS lcl_select_material IMPLEMENTATION.
 
       ENDLOOP.
 
-      "-----------------------------------------------
+      "Typ B Lagerbestand
+      IF l_matnr_b IS NOT INITIAL.
+        SELECT labst AS labst_b
+        INTO CORRESPONDING FIELDS OF TABLE @l_inventory_table
+        FROM mard
+        WHERE matnr = @l_matnr_b-matnr
+          AND werks = @l_matnr_b-werks.
+
+        APPEND l_inventory TO l_inventory_table.
+      ENDIF.
+
+      LOOP AT l_zsd_konk_allg ASSIGNING FIELD-SYMBOL(<fs_allg_b>).
+
+        READ TABLE l_inventory_table ASSIGNING FIELD-SYMBOL(<fs_inv_b>)
+             WITH KEY matnr = <fs_allg_b>-matnr.
+
+        IF sy-subrc = 0.
+          <fs_allg_b>-zlabst_b = <fs_inv_b>-labst_b.
+        ENDIF.
+
+      ENDLOOP.
+
+      "Typ B Lagerbestand
+
+      IF l_inventory_table IS INITIAL.
+        MESSAGE: 'Es wurden keine Lagerbestände gefunden.' TYPE 'E'.
+      ENDIF.
 
     ENDIF.
   ENDMETHOD.
@@ -177,14 +209,6 @@ CLASS lcl_select_material IMPLEMENTATION.
   ENDMETHOD.
 ENDCLASS.
 
-CLASS lcl_compare_material IMPLEMENTATION.
-  METHOD calculate_predecessor.
-
-    "-------------------------------------------------
-
-  ENDMETHOD.
-ENDCLASS.
-
 CLASS lcl_display_material IMPLEMENTATION.
   METHOD display_salv.
     IF p_flag = abap_true.
@@ -197,7 +221,7 @@ CLASS lcl_display_material IMPLEMENTATION.
     cl_salv_table=>factory( IMPORTING
                           r_salv_table = o_alv
                         CHANGING
-                          t_table = lt_zsd_konk_allg ).
+                          t_table = l_zsd_konk_allg ).
     o_alv->display( ).
 
   ENDMETHOD.

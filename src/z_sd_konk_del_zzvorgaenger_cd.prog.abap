@@ -10,11 +10,6 @@ CLASS lcl_select_material DEFINITION.
       delete_predecessor.
 ENDCLASS.
 
-CLASS lcl_compare_material DEFINITION.
-  PUBLIC SECTION.
-    METHODS: calculate_predecessor.
-ENDCLASS.
-
 CLASS lcl_display_material DEFINITION.
   PUBLIC SECTION.
     METHODS: display_salv.
